@@ -1,0 +1,44 @@
+{
+  "name": "arewegood-api",
+  "version": "0.1.0",
+  "description": "the backend service that powers arewegood",
+  "main": "server.js",
+  "arewegood": {
+    "config": ".settings/arewegood.json"
+  },
+  "scripts": {
+    "test": "mocha",
+    "start": "node server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hashtag-include/arewegood-api.git"
+  },
+  "keywords": [
+    "arewegood",
+    "api"
+  ],
+  "author": "Ben Greenier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hashtag-include/arewegood-api/issues"
+  },
+  "homepage": "https://github.com/hashtag-include/arewegood-api#readme",
+  "dependencies": {
+    "async": "^1.2.1",
+    "body-parser": "^1.12.4",
+    "bunyan": "^1.4.0",
+    "conar": "^1.0.3",
+    "github": "^0.2.4",
+    "passport": "^0.2.2",
+    "passport-github": "^0.1.5",
+    "passport-http-bearer": "^1.0.1",
+    "promise": "^7.0.1",
+    "restify": "^3.0.3",
+    "rethinkdb": "^2.0.0-1"
+  },
+  "devDependencies": {
+    "dox": "^0.8.0",
+    "mocha": "^2.2.5"
+  }
+}
