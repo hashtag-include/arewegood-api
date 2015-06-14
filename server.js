@@ -131,16 +131,8 @@ r.connect({
 }).then(function (server) {
 	var routes = require('./routes');
 	
-	// iterate all routes and mount them
-	// NOTE: if you want to add routes you need to change routes/index.js too!
-	for (var i = 0 ; i < routes.length; i++) {
-		if (typeof(routes[i]) === "object") {
-			var method = routes[i].method;
-			var path = routes[i].path;
-			var handler = routes[i].handler;
-			server[method](path, handler.bind(server));
-		}
-	}
+	// mount them all
+	routes(server);
 	
 	return server;
 	
