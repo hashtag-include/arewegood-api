@@ -12,6 +12,7 @@ var routes = require('../routes');
 
 var PORT = 1337;
 var HOSTNAME = "http://localhost:"+PORT;
+var RETHINK_DB = "test";
 
 describe("http routes", function () {
 	var server = null;
@@ -21,8 +22,12 @@ describe("http routes", function () {
 		server.listen(PORT, function () { done(); });
 	});
 	
-	it('HTTP / => 200 "OK"', function (done) {
-		yields.call(done, HOSTNAME+"/", '"OK"');
+	it('GET / => 200 "OK"', function (done) {
+		get.call(done, HOSTNAME+"/", '"OK"');
+	});
+	
+	it('POST /event/test "DATA" => 200 ""', function (done) {
+		post.call(done, HOSTNAME+"/event/test", "DATA");
 	});
 	
 	after(function () {
@@ -32,11 +37,22 @@ describe("http routes", function () {
 });
 
 // http tester helper
-function yields (path, content, code) {
+function get (path, content, code) {
 	code = code || 200;
 	
 	var done = this;
 	request(path, function (err, res, body) {
+		assert(err == null, err);
+		assert(res.statusCode === code, res.statusCode.toString());
+		assert(body == content, body);
+		done();
+	});
+}
+function post (path, content, code) {
+	code = code || 200;
+	
+	var done = this;
+	request.post(path, {json: JSON.stringify(content)}, function (err, res, body) {
 		assert(err == null, err);
 		assert(res.statusCode === code, res.statusCode.toString());
 		assert(body == content, body);

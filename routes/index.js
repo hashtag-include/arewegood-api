@@ -1,7 +1,8 @@
 // array of all routes we want our application
 // to use.
 var routes = [
-	require('./root')
+	require('./root'),
+	require('./event')
 ];
 
 

@@ -23,6 +23,7 @@ var config = conar()
 		"RETHINK_HOST": "",
 		"RETHINK_DB": "arewegood",
 		"RETHINK_USER_TB": "users",
+		"RETHINK_EVENT_TB": "events",
 		"RETHINK_PORT": 28015,
 		"RETHINK_AUTH": "",
 		"INSTANCE_NAME": "001",
@@ -36,6 +37,7 @@ var config = conar()
 	.env("PORT")
 	.env("LOGGER_LEVEL")
 	.env("RETHINK_USER_TB")
+	.env("RETHINK_EVENT_TB")
 	.env("RETHINK_DB")
 	.env("RETHINK_HOST")
 	.env("RETHINK_PORT")
