@@ -1,0 +1,108 @@
+FORMAT: 1A
+HOST: https://api.arewegood.io/
+
+# arewegood
+
+arewegood provides error handling and monitoring for services that matter.
+
+# arewegood [/]
+
+This resource does not have any attributes. Instead it offers the initial
+API affordances in the form of the links in the JSON body.
+
+It is recommend to follow the “url” link values,
+[Link](https://tools.ietf.org/html/rfc5988) or Location headers where
+applicable to retrieve resources. Instead of constructing your own URLs,
+to keep your client decoupled from implementation details.
+
+## Retrieve the Entry Point [GET]
+
++ Response 200 (application/json)
+
+        {
+            "event_url": "/event",
+            "auth_url": "/auth"
+        }
+
+## Group Event
+
+Resources related to events in the API.
+
+## Event [/event/{event_name}]
+
+An Event object has the following attributes:
+
++ name - the unique ID of the event
++ published_at - An ISO8601 date when the question was published.
++ count - the count of this unique event
+
++ Parameters
+    + event_name: testEvent (required, string) - Unique ID of the event
+
+### View the count of an event [GET]
+
+You can request the metadata of an event by sending a GET request.
+
++ Response 200 (application/json)
+
+        {
+            "name": "Favourite programming language?",
+            "published_at": "2014-11-11T08:40:51.620Z",
+            "count": 12
+        }
+
+### Trigger an event [POST]
+
+You can fire an event by sending a POST request.
+
++ Body (application/json)
+    + data: {} (optional, object) - optional extra data to send along with this event
+    
++ Response 200
+
+## Group Auth
+
+Resources related to authentication for the API.
+
+## Auth [/auth]
+
+An Auth object has the following attributes:
+
++ access_token - the unique access token used to authenticate against the API
+
+### Check for valid authentication [GET]
+
+This action allows you to retrieve a valid access_token, for your given session.
+
++ Response 200 (application/json)
+
+        {
+            "access_token": "aa22cc44ee66gg77ii"
+        }
+
+## Logging in [/auth/new]
+
+### Authenticate against Github [GET]
+
+You can trigger the oauth2 workflow to authenticate against github, and our service.
+This will redirect to Githubs oauth2 provider, prompt for creds, and redirect back to arewegood.
+
++ Response 302
+
+        + Headers
+        
+            + Location: https://github.com/login/oauth/authorize?response_type=code&redirect_uri=&scope=repo%2C%20user&client_id=ef3806b5e230190dc74f
+
+## Github Callback [/auth/callback]
+
+### Logged in [GET]
+
+Github will redirect back to `/auth/callback` once authentication has succeeded.
+We will then redirect to `/auth`.
+
++ Response 302
+
+        + Headers
+        
+            + Location: /auth
+
