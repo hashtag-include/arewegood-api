@@ -3,7 +3,6 @@
 /// <reference path="../typings/restify/restify.d.ts"/>
 /// <reference path="../typings/request/request.d.ts" />
 
-
 var assert = require('assert');
 var restify = require('restify');
 var request = require('request');

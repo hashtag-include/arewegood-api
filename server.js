@@ -6,10 +6,12 @@ var restify = require('restify');
 var bunyan = require('bunyan');
 var passport = require('passport');
 var BearerStrategy = require('passport-http-bearer').Strategy;
+var GithubStrategy = require('passport-github').Strategy;
 var bodyParser = require('body-parser');
 var r = require('rethinkdb');
 
 var pkg = require('./package.json');
+var User = require('./models/User');
 
 // the awg-api version
 var version = pkg.version;
@@ -29,6 +31,7 @@ var config = conar()
 		"INSTANCE_NAME": "001",
 		"GITHUB_ID": "",
 		"GITHUB_SECRET": "",
+		"GITHUB_CALLBACK": "",
 		"PORT": 1337,
 		"LOGGER_LEVEL": "info",
 		"THROTTLE_BURST": 100,
@@ -44,6 +47,7 @@ var config = conar()
 	.env("RETHINK_AUTH")
 	.env("GITHUB_ID")
 	.env("GITHUB_SECRET")
+	.env("GITHUB_CALLBACK")
 	.env("THROTTLE_BURST")
 	.env("THROTTLE_RATE")
 	.parse(configPath)
@@ -80,8 +84,6 @@ r.connect({
 	server._config = config;
 	
 	server.use(restify.acceptParser(server.acceptable));
-	server.use(restify.queryParser());
-	server.use(bodyParser.json());
 	server.use(restify.throttle({
 	  burst: config["THROTTLE_BURST"],
 	  rate: config["THROTTLE_RATE"],
@@ -97,6 +99,27 @@ r.connect({
 	passport.deserializeUser(function(obj, done) {
 	  done(null, obj);
 	});
+	
+	// use github strategy
+	passport.use(new GithubStrategy({
+	    clientID: config["GITHUB_ID"],
+	    clientSecret: config["GITHUB_SECRET"],
+	    callbackURL: config["GITHUB_CALLBACK"]
+	  },
+	  function(accessToken, refreshToken, profile, done) {
+		  r.table(config["RETHINK_USER_TB"]).insert(new User(accessToken, refreshToken, profile),{conflict: "update"}).run(server._db, function (err, user) {
+			 if (err) {
+				 logger.warn({err: err.stack, profile: profile, dbName: config["RETHINK_USER_TB"]}, "user db issue");
+				 return done(err);
+			 }
+			 if (!user) {
+				 logger.warn({err: err.stack, profile: profile, dbName: config["RETHINK_USER_TB"]}, "user not found");
+				 return done(err);
+			 }
+			 return done(null, user, {scope: 'all'});
+		  });
+	  }
+	));
 	
 	// use bearer strategy
 	passport.use(new BearerStrategy(
@@ -126,6 +149,13 @@ r.connect({
 		if (req.isAuthenticated()) { return next(); }
 			res.send(401, {error: "Not Authorized"});
 	});
+	
+	return server;
+	
+// parse stuff
+}).then(function (server) {
+	server.use(restify.queryParser());
+	server.use(bodyParser.json());
 	
 	return server;
 	

@@ -15,10 +15,10 @@ var event = new Route("/event/:eventName", function (req, res) {
 	
 	r.table(tb).insert(new Event(evt, optionalData)).run(db, function (err, result) {
 		if (err) {
-			logger.warn({err: err.stack, eventName: evt, dbName: tb}, "event db issue");
+			logger.trace({err: err.stack, eventName: evt, dbName: tb}, "event db issue");
 			return res.send(new restify.InternalError("Failed to write event/"+evt));
 		} else {
-			res.send(result);
+			res.send(200, result);
 		}
 	});
 }, "post");
